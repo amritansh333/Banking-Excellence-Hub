@@ -20,6 +20,7 @@ import AdminEnquiries, {
 } from "@/admin/pages/Leads";
 import AdminTestimonials from "@/admin/pages/Testimonials";
 import AdminFaqs from "@/admin/pages/Faqs";
+import AdminBlogs from "@/admin/pages/Blogs";
 
 // Public pages
 import NotFound from "@/pages/not-found";
@@ -29,6 +30,7 @@ import Program from "@/pages/Program";
 import Placements from "@/pages/Placements";
 import Gallery from "@/pages/Gallery";
 import Blog from "@/pages/Blog";
+import BlogDetail from "@/pages/BlogDetail";
 import Contact from "@/pages/Contact";
 import CareerGuidance from "@/pages/CareerGuidance";
 import Admission from "@/pages/Admission";
@@ -51,6 +53,7 @@ function PublicRouter() {
           <Route path="/program" component={Program} />
           <Route path="/placements" component={Placements} />
           <Route path="/gallery" component={Gallery} />
+          <Route path="/blog/:slug" component={BlogDetail} />
           <Route path="/blog" component={Blog} />
           <Route path="/contact" component={Contact} />
           <Route path="/career-guidance" component={CareerGuidance} />
@@ -129,6 +132,12 @@ function App() {
               <Route path="/admin/applications">
                 <RequireAdmin permission="leads.view">
                   <AdminApplications />
+                </RequireAdmin>
+              </Route>
+
+              <Route path="/admin/blogs">
+                <RequireAdmin permission="blog.view">
+                  <AdminBlogs />
                 </RequireAdmin>
               </Route>
 

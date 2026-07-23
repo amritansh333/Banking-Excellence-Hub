@@ -6,6 +6,7 @@ import adminRbacRouter from "./admin/rbac";
 import settingsRouter from "./admin/settings";
 import contentRouter from "./admin/content";
 import leadsRouter from "./admin/leads";
+import blogsRouter from "./admin/blogs";
 
 const router: IRouter = Router();
 
@@ -15,6 +16,7 @@ router.use(adminUsersRouter);
 router.use(adminRbacRouter);
 router.use(settingsRouter);
 router.use(contentRouter);
+router.use(blogsRouter);
 router.use(leadsRouter);
 
 export default router;

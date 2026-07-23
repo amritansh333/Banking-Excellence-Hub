@@ -90,6 +90,10 @@ temp/
 
 .local/
 .replit-artifact/
+.replit
+replit.md
+/replit.md
+.replitignore
 
 # =====================================================
 # Expo
@@ -140,11 +144,3 @@ typings/
 
 !pnpm-lock.yaml
 !pnpm-workspace.yaml
-
-
-
-
-.replit
-replit.md
-/replit.md
-.replitignore

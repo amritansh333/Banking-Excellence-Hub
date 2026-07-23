@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, type Variants } from "framer-motion";
 import { CheckCircle, Clock, Users, Award, BookOpen, ArrowRight, ChevronDown, Star } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
-const fadeUp = { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } };
-const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } };
+const fadeUp: Variants = { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } };
+const stagger: Variants = { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } };
 
 const modules = [
   { num: "01", title: "Banking Fundamentals & Products", topics: ["Structure of Indian Private Banking System", "Overview of Regulatory Authorities", "Types of Bank Accounts & Deposits", "Loans, Credit Products & NPA Management", "RBI Guidelines & Private Banking Regulations", "Financial Statements & Analysis"] },
@@ -73,7 +73,7 @@ const [faqs, setFaqs] = useState<Faq[]>([]);
 
   const loadFaqs = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/faqs");
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/faqs`);
       const data = await res.json();
       setFaqs(data);
     } catch (err) {

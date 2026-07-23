@@ -5,13 +5,23 @@ import { useAdminAuth } from "../lib/AdminAuthContext";
 
 const NAV_ITEMS: { label: string; href: string; permission?: string }[] = [
   { label: "Dashboard", href: "/admin" },
+
   { label: "Admin Users", href: "/admin/users", permission: "users.view" },
+
   { label: "Global Settings", href: "/admin/settings", permission: "settings.manage" },
+
   { label: "Navigation", href: "/admin/navigation", permission: "navigation.manage" },
+
   { label: "Enquiries", href: "/admin/enquiries", permission: "leads.view" },
+
   { label: "Applications", href: "/admin/applications", permission: "leads.view" },
+
+  { label: "Blogs", href: "/admin/blogs", permission: "blog.view" },
+
   { label: "Testimonials", href: "/admin/testimonials", permission: "testimonials.manage" },
+
   { label: "FAQs", href: "/admin/faqs", permission: "faqs.manage" },
+
   { label: "Audit Log", href: "/admin/audit-log", permission: "audit_log.view" },
 ];
 
@@ -25,8 +35,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen flex bg-muted/30">
-      <aside className="w-64 shrink-0 bg-[#0B1F4D] text-white flex flex-col">
+    <div className="h-screen flex overflow-hidden bg-muted/30">
+      <aside className="sticky top-0 h-screen w-64 shrink-0 bg-[#0B1F4D] text-white flex flex-col">
         <div className="px-5 py-6 border-b border-white/10">
           <p className="font-serif text-lg font-semibold">The Bankers Academy</p>
           <p className="text-xs text-white/60">Admin Panel</p>
@@ -49,14 +59,14 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           <p>{user?.role?.name}</p>
         </div>
       </aside>
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-screen">
         <header className="h-14 border-b bg-white flex items-center justify-between px-6">
           <p className="text-sm text-muted-foreground">Signed in as {user?.email}</p>
           <Button variant="outline" size="sm" onClick={handleLogout}>
             Log out
           </Button>
         </header>
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>
   );
