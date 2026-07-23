@@ -10,6 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
+const API_BASE =
+  import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const fadeUp: Variants = { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } };
 const stagger: Variants = { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } };
 
@@ -46,7 +49,7 @@ export default function Contact() {
   setSubmitting(true);
 
   try {
-    const response = await fetch(`${import.meta.env.BASE_URL}api/enquiries`, {
+    const response = await fetch(`${API_BASE}/api/enquiries`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

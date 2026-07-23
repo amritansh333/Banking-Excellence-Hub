@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { motion, type Variants } from "framer-motion";
 import { Phone, Mail, MapPin, CheckCircle, Send, User, BookOpen, MessageSquare } from "lucide-react";
 
+const API_BASE =
+  import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const fadeUp: Variants = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } } };
 const stagger: Variants = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
 
@@ -40,7 +43,7 @@ export default function Enquiry() {
     setError(null);
     setSubmitting(true);
     try {
-      const res = await fetch(`${import.meta.env.BASE_URL}api/enquiries`, {
+      const res = await fetch(`${API_BASE}/api/enquiries`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

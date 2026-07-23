@@ -30,6 +30,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://thebankersacademy.org",
   "https://www.thebankersacademy.org",
+  "https://banking-excellence-hub-bankers-acad.vercel.app",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 

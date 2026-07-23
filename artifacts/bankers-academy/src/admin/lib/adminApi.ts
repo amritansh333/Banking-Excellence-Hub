@@ -1,4 +1,7 @@
-const BASE = `${import.meta.env.BASE_URL}api`.replace(/\/$/, "");
+const API_BASE =
+  import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const BASE = `${API_BASE}/api`;
 
 export class AdminApiError extends Error {
   status: number;
