@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, type Variants } from "framer-motion";
 import { CheckCircle, ArrowRight, TrendingUp, Users, Building2, Award } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
-const fadeUp = { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } };
-const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
+const fadeUp: Variants = { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } };
+const stagger: Variants = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 
 const placementProcess = [
   { step: "01", title: "Resume Building", desc: "Expert review and professional polish of your resume and LinkedIn profile by our placement team." },

@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { Link } from "wouter";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, type Variants } from "framer-motion";
 import { useRef } from "react";
 import { BookOpen, Clock, Users, Award, CheckCircle, ArrowRight, Star, ChevronRight, Target, TrendingUp } from "lucide-react";
 
-const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } } };
-const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
+const fadeUp: Variants = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } } };
+const stagger: Variants = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
 
 const modules = [
   {

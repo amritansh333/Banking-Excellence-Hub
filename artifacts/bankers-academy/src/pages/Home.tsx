@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, type Variants } from "framer-motion";
 import {
   Award, Users, Briefcase, TrendingUp, BookOpen, Target, Mic2, Shield,
   ChevronRight, CheckCircle, ArrowRight, Phone, MapPin, Mail,Volume2, VolumeX
@@ -30,9 +30,9 @@ function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: str
   return <span ref={ref}>{count}{suffix}</span>;
 }
 
-const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } } };
-const fadeIn = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.6 } } };
-const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
+const fadeUp: Variants = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } } };
+const fadeIn: Variants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.6 } } };
+const stagger: Variants = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 
 const trustedPartners = [
   "HDFC Bank", "ICICI Bank", "Axis Bank", "Kotak Mahindra Bank", "SBI",

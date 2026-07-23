@@ -51,6 +51,13 @@ router.post("/admin/users", requirePermission(PERMISSIONS.USERS_MANAGE), async (
     res.status(400).json({ error: "Password does not meet strength requirements." });
     return;
   }
+
+  const [role] = await db.select({ id: rolesTable.id }).from(rolesTable).where(eq(rolesTable.id, parsed.data.roleId));
+  if (!role) {
+    res.status(400).json({ error: "Selected role does not exist." });
+    return;
+  }
+
   const passwordHash = await hashPassword(parsed.data.password);
   const [user] = await db
     .insert(adminUsersTable)

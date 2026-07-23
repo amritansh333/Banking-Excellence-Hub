@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, type Variants } from "framer-motion";
 import { Award, Users, Target, BookOpen, Lightbulb, Shield, Heart, TrendingUp, CheckCircle } from "lucide-react";
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
 };
-const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
+const stagger: Variants = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 
 const leadership = [
   { name: "Mr. Rajeev Taneja", role: "Chief Patron", exp: "Decades of experience as a businessman", desc: "An Experienced businessman having a vast experience of running businesses with in-depth knowledge of finance.", initials: "RT" },
