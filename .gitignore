@@ -144,3 +144,6 @@ typings/
 
 !pnpm-lock.yaml
 !pnpm-workspace.yaml
+
+
+vercel.json
