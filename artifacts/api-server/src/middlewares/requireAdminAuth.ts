@@ -18,25 +18,13 @@ export async function requireAdminAuth(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  console.log("========== ADMIN AUTH ==========");
-  console.log("Cookie Header:", req.headers.cookie);
-  console.log("Parsed Cookies:", req.cookies);
-
   const sessionId = req.cookies?.[SESSION_COOKIE_NAME];
-
-  console.log("Session ID:", sessionId);
-
   const user = await getSessionUser(sessionId);
 
-  console.log("Resolved User:", user);
-
   if (!user) {
-    console.log("AUTH FAILED");
     res.status(401).json({ error: "Not authenticated" });
     return;
   }
-
-  console.log("AUTH SUCCESS");
 
   req.adminUser = user;
   req.adminPermissions = await getUserPermissions(user);

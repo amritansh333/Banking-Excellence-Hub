@@ -42,17 +42,7 @@ export async function destroySession(sessionId: string): Promise<void> {
 }
 
 export async function getSessionUser(sessionId: string | undefined) {
-  console.log("getSessionUser()");
-  console.log("Incoming session:", sessionId);
-
-  if (!sessionId) {
-    console.log("No session id");
-    return null;
-  }
-
-  const allSessions = await db.select().from(adminSessionsTable);
-
-  console.log("Total sessions:", allSessions.length);
+  if (!sessionId) return null;
 
   const [session] = await db
     .select()
@@ -64,24 +54,14 @@ export async function getSessionUser(sessionId: string | undefined) {
       )
     );
 
-  console.log("Matched session:", session);
-
-  if (!session) {
-    console.log("Session not found");
-    return null;
-  }
+  if (!session) return null;
 
   const [user] = await db
     .select()
     .from(adminUsersTable)
     .where(eq(adminUsersTable.id, session.userId));
 
-  console.log("Matched user:", user);
-
-  if (!user || user.status !== "ACTIVE") {
-    console.log("User invalid");
-    return null;
-  }
+  if (!user || user.status !== "ACTIVE") return null;
 
   return user;
 }
