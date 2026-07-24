@@ -30,7 +30,10 @@ type GlobalSettings = {
   twitterUrl: string | null;
 };
 
-const FIELD_GROUPS: { title: string; fields: { key: keyof GlobalSettings; label: string }[] }[] = [
+const FIELD_GROUPS: {
+  title: string;
+  fields: { key: keyof GlobalSettings; label: string }[];
+}[] = [
   {
     title: "Organization",
     fields: [
@@ -100,38 +103,67 @@ export default function Settings() {
     setError(null);
     try {
       const { id, ...payload } = settings;
-      const updated = await adminApi.patch<GlobalSettings>("/admin/settings", payload);
+      const updated = await adminApi.patch<GlobalSettings>(
+        "/admin/settings",
+        payload,
+      );
       setSettings(updated);
       setSaved(true);
     } catch (err) {
-      setError(err instanceof AdminApiError ? err.message : "Failed to save settings.");
+      setError(
+        err instanceof AdminApiError ? err.message : "Failed to save settings.",
+      );
     } finally {
       setSaving(false);
     }
   };
 
   if (loading || !settings) {
-    return <p className="text-sm text-muted-foreground">Loading…</p>;
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
+        <div className="h-12 w-12 rounded-full border-4 border-[#0B1F4D] border-t-transparent animate-spin" />
+        <p className="text-sm text-muted-foreground">Loading settings...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div>
-        <h1 className="text-2xl font-serif font-semibold text-[#0B1F4D]">Global Settings</h1>
-        <p className="text-muted-foreground">
-          Contact details, address and social links used across the website header, footer and contact sections.
-        </p>
+    <div className="space-y-6 max-w-7xl">
+      {/* Hero Section */}
+      <div className="rounded-2xl border bg-gradient-to-r from-[#0B1F4D] via-[#15367E] to-[#2355C4] p-6 md:p-8 text-white shadow-lg">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-serif font-semibold">
+              Global Settings
+            </h1>
+
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-blue-100">
+              Configure organization details, contact information, office
+              address and social media links used throughout the public website.
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-white/10 px-5 py-4 backdrop-blur w-fit">
+            <p className="text-xs uppercase tracking-wider text-blue-100">
+              Website Configuration
+            </p>
+
+            <p className="mt-1 text-lg font-semibold">Settings Dashboard</p>
+          </div>
+        </div>
       </div>
 
       {FIELD_GROUPS.map((group) => (
-        <Card key={group.title}>
-          <CardHeader>
+        <Card key={group.title} className="border shadow-md">
+          <CardHeader className="border-b">
             <CardTitle className="text-base">{group.title}</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          <CardContent className="grid grid-cols-1 gap-4 pt-6 md:grid-cols-2">
             {group.fields.map((field) => (
               <div key={field.key} className="space-y-1.5">
                 <Label>{field.label}</Label>
+
                 <Input
                   disabled={!canManage}
                   value={(settings[field.key] as string) ?? ""}
@@ -143,13 +175,30 @@ export default function Settings() {
         </Card>
       ))}
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      {saved && <p className="text-sm text-green-700">Settings saved.</p>}
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
+
+      {saved && (
+        <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+          <p className="text-sm font-medium text-green-700">
+            Settings saved successfully.
+          </p>
+        </div>
+      )}
 
       {canManage && (
-        <Button onClick={handleSave} disabled={saving} className="bg-[#C89B3C] text-[#0B1F4D] hover:bg-[#C89B3C]">
-          {saving ? "Saving…" : "Save changes"}
-        </Button>
+        <div className="flex justify-end">
+          <Button
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-[#C89B3C] text-[#0B1F4D] hover:bg-[#d4aa50] hover:text-[#0B1F4D] cursor-pointer"
+          >
+            {saving ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
       )}
     </div>
   );

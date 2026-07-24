@@ -2,7 +2,10 @@ import { Router, type IRouter } from "express";
 import { z } from "zod/v4";
 import { eq } from "drizzle-orm";
 import { db, globalSettingsTable, navigationItemsTable } from "@workspace/db";
-import { requireAdminAuth, requirePermission } from "../../middlewares/requireAdminAuth";
+import {
+  requireAdminAuth,
+  requirePermission,
+} from "../../middlewares/requireAdminAuth";
 import { writeAuditLog } from "../../lib/audit";
 import { PERMISSIONS } from "../../lib/permissions";
 
@@ -21,14 +24,21 @@ router.get("/settings", async (_req, res): Promise<void> => {
 });
 
 router.get("/navigation", async (_req, res): Promise<void> => {
-  const items = await db.select().from(navigationItemsTable).where(eq(navigationItemsTable.visible, "true"));
+  const items = await db
+    .select()
+    .from(navigationItemsTable)
+    .where(eq(navigationItemsTable.visible, "true"));
   res.json(items.sort((a, b) => a.displayOrder - b.displayOrder));
 });
 
-router.get("/admin/settings", requireAdminAuth, async (_req, res): Promise<void> => {
-  const settings = await getOrCreateSettings();
-  res.json(settings);
-});
+router.get(
+  "/admin/settings",
+  requireAdminAuth,
+  async (_req, res): Promise<void> => {
+    const settings = await getOrCreateSettings();
+    res.json(settings);
+  },
+);
 
 const settingsSchema = z.object({
   orgName: z.string().min(1).optional(),
@@ -146,7 +156,9 @@ router.patch(
   requireAdminAuth,
   requirePermission(PERMISSIONS.NAVIGATION_MANAGE),
   async (req, res): Promise<void> => {
-    const id = Number(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id);
+    const id = Number(
+      Array.isArray(req.params.id) ? req.params.id[0] : req.params.id,
+    );
     const parsed = navItemSchema.partial().safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: parsed.error.message });
@@ -156,12 +168,20 @@ router.patch(
     if (parsed.data.menu) updates.menu = parsed.data.menu;
     if (parsed.data.label) updates.label = parsed.data.label;
     if (parsed.data.url !== undefined) updates.url = parsed.data.url;
-    if (parsed.data.isExternal !== undefined) updates.isExternal = parsed.data.isExternal ? "true" : "false";
-    if (parsed.data.displayOrder !== undefined) updates.displayOrder = parsed.data.displayOrder;
-    if (parsed.data.visible !== undefined) updates.visible = parsed.data.visible ? "true" : "false";
-    if (parsed.data.isCta !== undefined) updates.isCta = parsed.data.isCta ? "true" : "false";
+    if (parsed.data.isExternal !== undefined)
+      updates.isExternal = parsed.data.isExternal ? "true" : "false";
+    if (parsed.data.displayOrder !== undefined)
+      updates.displayOrder = parsed.data.displayOrder;
+    if (parsed.data.visible !== undefined)
+      updates.visible = parsed.data.visible ? "true" : "false";
+    if (parsed.data.isCta !== undefined)
+      updates.isCta = parsed.data.isCta ? "true" : "false";
 
-    const [item] = await db.update(navigationItemsTable).set(updates).where(eq(navigationItemsTable.id, id)).returning();
+    const [item] = await db
+      .update(navigationItemsTable)
+      .set(updates)
+      .where(eq(navigationItemsTable.id, id))
+      .returning();
     if (!item) {
       res.status(404).json({ error: "Navigation item not found" });
       return;
@@ -185,8 +205,13 @@ router.delete(
   requireAdminAuth,
   requirePermission(PERMISSIONS.NAVIGATION_MANAGE),
   async (req, res): Promise<void> => {
-    const id = Number(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id);
-    const [item] = await db.delete(navigationItemsTable).where(eq(navigationItemsTable.id, id)).returning();
+    const id = Number(
+      Array.isArray(req.params.id) ? req.params.id[0] : req.params.id,
+    );
+    const [item] = await db
+      .delete(navigationItemsTable)
+      .where(eq(navigationItemsTable.id, id))
+      .returning();
     if (!item) {
       res.status(404).json({ error: "Navigation item not found" });
       return;

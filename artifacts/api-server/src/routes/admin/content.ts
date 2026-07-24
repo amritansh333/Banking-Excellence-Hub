@@ -7,7 +7,10 @@ import {
   insertTestimonialSchema,
   insertFaqSchema,
 } from "@workspace/db";
-import { requireAdminAuth, requirePermission } from "../../middlewares/requireAdminAuth";
+import {
+  requireAdminAuth,
+  requirePermission,
+} from "../../middlewares/requireAdminAuth";
 import { writeAuditLog } from "../../lib/audit";
 import { PERMISSIONS } from "../../lib/permissions";
 
@@ -20,12 +23,18 @@ function parseId(param: string | string[]): number {
 // ---------- Public ----------
 
 router.get("/testimonials", async (_req, res): Promise<void> => {
-  const rows = await db.select().from(testimonialsTable).where(eq(testimonialsTable.status, "PUBLISHED"));
+  const rows = await db
+    .select()
+    .from(testimonialsTable)
+    .where(eq(testimonialsTable.status, "PUBLISHED"));
   res.json(rows.sort((a, b) => a.displayOrder - b.displayOrder));
 });
 
 router.get("/faqs", async (_req, res): Promise<void> => {
-  const rows = await db.select().from(faqsTable).where(eq(faqsTable.status, "PUBLISHED"));
+  const rows = await db
+    .select()
+    .from(faqsTable)
+    .where(eq(faqsTable.status, "PUBLISHED"));
   res.json(rows.sort((a, b) => a.displayOrder - b.displayOrder));
 });
 
@@ -51,7 +60,10 @@ router.post(
       res.status(400).json({ error: parsed.error.message });
       return;
     }
-    const [row] = await db.insert(testimonialsTable).values(parsed.data).returning();
+    const [row] = await db
+      .insert(testimonialsTable)
+      .values(parsed.data)
+      .returning();
     await writeAuditLog(req, {
       actorId: req.adminUser!.id,
       actorLabel: req.adminUser!.fullName,
@@ -102,7 +114,10 @@ router.delete(
   requirePermission(PERMISSIONS.TESTIMONIALS_MANAGE),
   async (req, res): Promise<void> => {
     const id = parseId(req.params.id);
-    const [row] = await db.delete(testimonialsTable).where(eq(testimonialsTable.id, id)).returning();
+    const [row] = await db
+      .delete(testimonialsTable)
+      .where(eq(testimonialsTable.id, id))
+      .returning();
     if (!row) {
       res.status(404).json({ error: "Testimonial not found" });
       return;
@@ -165,7 +180,11 @@ router.patch(
       res.status(400).json({ error: parsed.error.message });
       return;
     }
-    const [row] = await db.update(faqsTable).set(parsed.data).where(eq(faqsTable.id, id)).returning();
+    const [row] = await db
+      .update(faqsTable)
+      .set(parsed.data)
+      .where(eq(faqsTable.id, id))
+      .returning();
     if (!row) {
       res.status(404).json({ error: "FAQ not found" });
       return;
@@ -188,7 +207,10 @@ router.delete(
   requirePermission(PERMISSIONS.FAQS_MANAGE),
   async (req, res): Promise<void> => {
     const id = parseId(req.params.id);
-    const [row] = await db.delete(faqsTable).where(eq(faqsTable.id, id)).returning();
+    const [row] = await db
+      .delete(faqsTable)
+      .where(eq(faqsTable.id, id))
+      .returning();
     if (!row) {
       res.status(404).json({ error: "FAQ not found" });
       return;

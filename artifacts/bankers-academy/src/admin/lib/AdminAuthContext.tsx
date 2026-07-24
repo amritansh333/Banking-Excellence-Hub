@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react";
 import { adminApi, type AdminMe } from "./adminApi";
 
 type AdminAuthState = {
@@ -41,7 +48,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <AdminAuthContext.Provider value={{ user, loading, hasPermission, refresh, logout }}>
+    <AdminAuthContext.Provider
+      value={{ user, loading, hasPermission, refresh, logout }}
+    >
       {children}
     </AdminAuthContext.Provider>
   );
@@ -49,6 +58,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
 export function useAdminAuth(): AdminAuthState {
   const ctx = useContext(AdminAuthContext);
-  if (!ctx) throw new Error("useAdminAuth must be used within AdminAuthProvider");
+  if (!ctx)
+    throw new Error("useAdminAuth must be used within AdminAuthProvider");
   return ctx;
 }

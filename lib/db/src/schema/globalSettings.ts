@@ -26,7 +26,10 @@ export const globalSettingsTable = pgTable("global_settings", {
   youtubeUrl: text("youtube_url"),
   twitterUrl: text("twitter_url"),
   updatedBy: text("updated_by"),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export type GlobalSettings = typeof globalSettingsTable.$inferSelect;
@@ -41,7 +44,9 @@ export const navigationItemsTable = pgTable("navigation_items", {
   displayOrder: integer("display_order").notNull().default(0),
   visible: text("visible").notNull().default("true"),
   isCta: text("is_cta").notNull().default("false"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export type NavigationItem = typeof navigationItemsTable.$inferSelect;

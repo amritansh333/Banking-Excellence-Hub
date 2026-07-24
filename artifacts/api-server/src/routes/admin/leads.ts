@@ -7,7 +7,10 @@ import {
   insertEnquirySchema,
   insertApplicationSchema,
 } from "@workspace/db";
-import { requireAdminAuth, requirePermission } from "../../middlewares/requireAdminAuth";
+import {
+  requireAdminAuth,
+  requirePermission,
+} from "../../middlewares/requireAdminAuth";
 import { writeAuditLog } from "../../lib/audit";
 import { PERMISSIONS } from "../../lib/permissions";
 
@@ -39,7 +42,10 @@ router.post("/applications", async (req, res): Promise<void> => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  const [row] = await db.insert(applicationsTable).values(parsed.data).returning();
+  const [row] = await db
+    .insert(applicationsTable)
+    .values(parsed.data)
+    .returning();
   res.status(201).json({ id: row.id });
 });
 
@@ -66,7 +72,11 @@ router.patch(
       res.status(400).json({ error: parsed.error.message });
       return;
     }
-    const [row] = await db.update(enquiriesTable).set(parsed.data).where(eq(enquiriesTable.id, id)).returning();
+    const [row] = await db
+      .update(enquiriesTable)
+      .set(parsed.data)
+      .where(eq(enquiriesTable.id, id))
+      .returning();
     if (!row) {
       res.status(404).json({ error: "Enquiry not found" });
       return;
@@ -89,7 +99,10 @@ router.delete(
   requirePermission(PERMISSIONS.LEADS_MANAGE),
   async (req, res): Promise<void> => {
     const id = parseId(req.params.id);
-    const [row] = await db.delete(enquiriesTable).where(eq(enquiriesTable.id, id)).returning();
+    const [row] = await db
+      .delete(enquiriesTable)
+      .where(eq(enquiriesTable.id, id))
+      .returning();
     if (!row) {
       res.status(404).json({ error: "Enquiry not found" });
       return;
@@ -156,7 +169,10 @@ router.delete(
   requirePermission(PERMISSIONS.LEADS_MANAGE),
   async (req, res): Promise<void> => {
     const id = parseId(req.params.id);
-    const [row] = await db.delete(applicationsTable).where(eq(applicationsTable.id, id)).returning();
+    const [row] = await db
+      .delete(applicationsTable)
+      .where(eq(applicationsTable.id, id))
+      .returning();
     if (!row) {
       res.status(404).json({ error: "Application not found" });
       return;

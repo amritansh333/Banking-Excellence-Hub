@@ -1,4 +1,11 @@
-import { pgTable, serial, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  serial,
+  text,
+  integer,
+  boolean,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -15,11 +22,18 @@ export const testimonialsTable = pgTable("testimonials", {
   featured: boolean("featured").notNull().default(false),
   showOnHomepage: boolean("show_on_homepage").notNull().default(false),
   showOnCoursePage: boolean("show_on_course_page").notNull().default(false),
-  showOnTestimonialsPage: boolean("show_on_testimonials_page").notNull().default(true),
+  showOnTestimonialsPage: boolean("show_on_testimonials_page")
+    .notNull()
+    .default(true),
   displayOrder: integer("display_order").notNull().default(0),
   status: text("status").notNull().default("PUBLISHED"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export const faqsTable = pgTable("faqs", {
@@ -31,14 +45,25 @@ export const faqsTable = pgTable("faqs", {
   relatedCourseId: integer("related_course_id"),
   displayOrder: integer("display_order").notNull().default(0),
   status: text("status").notNull().default("PUBLISHED"), // PUBLISHED, UNPUBLISHED, ARCHIVED
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
-export const insertTestimonialSchema = createInsertSchema(testimonialsTable).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertTestimonialSchema = createInsertSchema(
+  testimonialsTable,
+).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertTestimonial = z.infer<typeof insertTestimonialSchema>;
 export type Testimonial = typeof testimonialsTable.$inferSelect;
 
-export const insertFaqSchema = createInsertSchema(faqsTable).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertFaqSchema = createInsertSchema(faqsTable).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 export type InsertFaq = z.infer<typeof insertFaqSchema>;
 export type Faq = typeof faqsTable.$inferSelect;

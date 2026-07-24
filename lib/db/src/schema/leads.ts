@@ -16,8 +16,13 @@ export const enquiriesTable = pgTable("enquiries", {
   status: text("status").notNull().default("NEW"), // NEW, CONTACTED, FOLLOW_UP, QUALIFIED, CLOSED, SPAM
   assignedTo: integer("assigned_to"),
   notes: text("notes"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export const applicationsTable = pgTable("applications", {
@@ -47,14 +52,25 @@ export const applicationsTable = pgTable("applications", {
   assignedTo: integer("assigned_to"),
   notes: text("notes"),
 
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
-export const insertEnquirySchema = createInsertSchema(enquiriesTable).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertEnquirySchema = createInsertSchema(enquiriesTable).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 export type InsertEnquiry = z.infer<typeof insertEnquirySchema>;
 export type Enquiry = typeof enquiriesTable.$inferSelect;
 
-export const insertApplicationSchema = createInsertSchema(applicationsTable).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertApplicationSchema = createInsertSchema(
+  applicationsTable,
+).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertApplication = z.infer<typeof insertApplicationSchema>;
 export type Application = typeof applicationsTable.$inferSelect;

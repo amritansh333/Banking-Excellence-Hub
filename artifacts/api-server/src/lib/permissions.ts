@@ -40,40 +40,136 @@ export const PERMISSIONS = {
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 
-export const PERMISSION_CATALOGUE: { key: PermissionKey; category: string; label: string }[] = [
-  { key: PERMISSIONS.DASHBOARD_VIEW, category: "Dashboard", label: "View dashboard" },
-  { key: PERMISSIONS.USERS_VIEW, category: "Admin Users", label: "View admin users" },
-  { key: PERMISSIONS.USERS_MANAGE, category: "Admin Users", label: "Manage admin users" },
-  { key: PERMISSIONS.ROLES_MANAGE, category: "Admin Users", label: "Manage roles & permissions" },
+export const PERMISSION_CATALOGUE: {
+  key: PermissionKey;
+  category: string;
+  label: string;
+}[] = [
+  {
+    key: PERMISSIONS.DASHBOARD_VIEW,
+    category: "Dashboard",
+    label: "View dashboard",
+  },
+  {
+    key: PERMISSIONS.USERS_VIEW,
+    category: "Admin Users",
+    label: "View admin users",
+  },
+  {
+    key: PERMISSIONS.USERS_MANAGE,
+    category: "Admin Users",
+    label: "Manage admin users",
+  },
+  {
+    key: PERMISSIONS.ROLES_MANAGE,
+    category: "Admin Users",
+    label: "Manage roles & permissions",
+  },
   { key: PERMISSIONS.PAGES_VIEW, category: "CMS Pages", label: "View pages" },
   { key: PERMISSIONS.PAGES_EDIT, category: "CMS Pages", label: "Edit pages" },
-  { key: PERMISSIONS.PAGES_PUBLISH, category: "CMS Pages", label: "Publish pages" },
+  {
+    key: PERMISSIONS.PAGES_PUBLISH,
+    category: "CMS Pages",
+    label: "Publish pages",
+  },
   { key: PERMISSIONS.COURSES_VIEW, category: "Courses", label: "View courses" },
-  { key: PERMISSIONS.COURSES_MANAGE, category: "Courses", label: "Manage courses" },
-  { key: PERMISSIONS.COURSES_PUBLISH, category: "Courses", label: "Publish courses" },
+  {
+    key: PERMISSIONS.COURSES_MANAGE,
+    category: "Courses",
+    label: "Manage courses",
+  },
+  {
+    key: PERMISSIONS.COURSES_PUBLISH,
+    category: "Courses",
+    label: "Publish courses",
+  },
   { key: PERMISSIONS.BLOG_VIEW, category: "Blog", label: "View blog posts" },
-  { key: PERMISSIONS.BLOG_MANAGE, category: "Blog", label: "Manage blog posts" },
-  { key: PERMISSIONS.BLOG_PUBLISH, category: "Blog", label: "Publish blog posts" },
-  { key: PERMISSIONS.TESTIMONIALS_MANAGE, category: "Testimonials", label: "Manage testimonials" },
+  {
+    key: PERMISSIONS.BLOG_MANAGE,
+    category: "Blog",
+    label: "Manage blog posts",
+  },
+  {
+    key: PERMISSIONS.BLOG_PUBLISH,
+    category: "Blog",
+    label: "Publish blog posts",
+  },
+  {
+    key: PERMISSIONS.TESTIMONIALS_MANAGE,
+    category: "Testimonials",
+    label: "Manage testimonials",
+  },
   { key: PERMISSIONS.FAQS_MANAGE, category: "FAQs", label: "Manage FAQs" },
-  { key: PERMISSIONS.MEDIA_VIEW, category: "Media", label: "View media library" },
-  { key: PERMISSIONS.MEDIA_MANAGE, category: "Media", label: "Manage media library" },
-  { key: PERMISSIONS.LEADS_VIEW, category: "Leads", label: "View enquiries & applications" },
-  { key: PERMISSIONS.LEADS_MANAGE, category: "Leads", label: "Manage enquiries & applications" },
-  { key: PERMISSIONS.NAVIGATION_MANAGE, category: "Site Structure", label: "Manage navigation, header & footer" },
-  { key: PERMISSIONS.SETTINGS_MANAGE, category: "Site Structure", label: "Manage global settings" },
-  { key: PERMISSIONS.SEO_MANAGE, category: "SEO", label: "Manage SEO settings" },
-  { key: PERMISSIONS.REDIRECTS_MANAGE, category: "SEO", label: "Manage redirects" },
-  { key: PERMISSIONS.AUDIT_LOG_VIEW, category: "Audit", label: "View audit log" },
+  {
+    key: PERMISSIONS.MEDIA_VIEW,
+    category: "Media",
+    label: "View media library",
+  },
+  {
+    key: PERMISSIONS.MEDIA_MANAGE,
+    category: "Media",
+    label: "Manage media library",
+  },
+  {
+    key: PERMISSIONS.LEADS_VIEW,
+    category: "Leads",
+    label: "View enquiries & applications",
+  },
+  {
+    key: PERMISSIONS.LEADS_MANAGE,
+    category: "Leads",
+    label: "Manage enquiries & applications",
+  },
+  {
+    key: PERMISSIONS.NAVIGATION_MANAGE,
+    category: "Site Structure",
+    label: "Manage navigation, header & footer",
+  },
+  {
+    key: PERMISSIONS.SETTINGS_MANAGE,
+    category: "Site Structure",
+    label: "Manage global settings",
+  },
+  {
+    key: PERMISSIONS.SEO_MANAGE,
+    category: "SEO",
+    label: "Manage SEO settings",
+  },
+  {
+    key: PERMISSIONS.REDIRECTS_MANAGE,
+    category: "SEO",
+    label: "Manage redirects",
+  },
+  {
+    key: PERMISSIONS.AUDIT_LOG_VIEW,
+    category: "Audit",
+    label: "View audit log",
+  },
 ];
 
 export const ALL_PERMISSION_KEYS = PERMISSION_CATALOGUE.map((p) => p.key);
 
 export const DEFAULT_PERSONAS = [
-  { key: "super_admin", name: "Super Admin", description: "Full unrestricted access to every module." },
-  { key: "content_manager", name: "Content Manager", description: "Manages pages, courses, blog and testimonials." },
-  { key: "admissions_officer", name: "Admissions Officer", description: "Manages leads, enquiries and applications." },
-  { key: "seo_manager", name: "SEO Manager", description: "Manages SEO, redirects and structured data." },
+  {
+    key: "super_admin",
+    name: "Super Admin",
+    description: "Full unrestricted access to every module.",
+  },
+  {
+    key: "content_manager",
+    name: "Content Manager",
+    description: "Manages pages, courses, blog and testimonials.",
+  },
+  {
+    key: "admissions_officer",
+    name: "Admissions Officer",
+    description: "Manages leads, enquiries and applications.",
+  },
+  {
+    key: "seo_manager",
+    name: "SEO Manager",
+    description: "Manages SEO, redirects and structured data.",
+  },
 ];
 
 export const DEFAULT_ROLES: {
@@ -95,7 +191,8 @@ export const DEFAULT_ROLES: {
   {
     key: "content_manager",
     name: "Content Manager",
-    description: "Manages website content across pages, courses, blog, testimonials and FAQs.",
+    description:
+      "Manages website content across pages, courses, blog, testimonials and FAQs.",
     personaKey: "content_manager",
     isSuperAdmin: false,
     permissions: [
@@ -119,10 +216,15 @@ export const DEFAULT_ROLES: {
   {
     key: "admissions_officer",
     name: "Admissions Officer",
-    description: "Manages enquiries and applications from prospective students.",
+    description:
+      "Manages enquiries and applications from prospective students.",
     personaKey: "admissions_officer",
     isSuperAdmin: false,
-    permissions: [PERMISSIONS.DASHBOARD_VIEW, PERMISSIONS.LEADS_VIEW, PERMISSIONS.LEADS_MANAGE],
+    permissions: [
+      PERMISSIONS.DASHBOARD_VIEW,
+      PERMISSIONS.LEADS_VIEW,
+      PERMISSIONS.LEADS_MANAGE,
+    ],
   },
   {
     key: "seo_manager",
@@ -130,6 +232,11 @@ export const DEFAULT_ROLES: {
     description: "Manages SEO metadata, redirects and structured data.",
     personaKey: "seo_manager",
     isSuperAdmin: false,
-    permissions: [PERMISSIONS.DASHBOARD_VIEW, PERMISSIONS.SEO_MANAGE, PERMISSIONS.REDIRECTS_MANAGE, PERMISSIONS.PAGES_VIEW],
+    permissions: [
+      PERMISSIONS.DASHBOARD_VIEW,
+      PERMISSIONS.SEO_MANAGE,
+      PERMISSIONS.REDIRECTS_MANAGE,
+      PERMISSIONS.PAGES_VIEW,
+    ],
   },
 ];

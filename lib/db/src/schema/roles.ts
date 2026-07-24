@@ -8,11 +8,18 @@ export const rolesTable = pgTable("roles", {
   key: text("key").notNull().unique(),
   name: text("name").notNull(),
   description: text("description"),
-  personaId: integer("persona_id").references(() => personasTable.id, { onDelete: "set null" }),
+  personaId: integer("persona_id").references(() => personasTable.id, {
+    onDelete: "set null",
+  }),
   isSuperAdmin: text("is_super_admin").notNull().default("false"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
-export const insertRoleSchema = createInsertSchema(rolesTable).omit({ id: true, createdAt: true });
+export const insertRoleSchema = createInsertSchema(rolesTable).omit({
+  id: true,
+  createdAt: true,
+});
 export type InsertRole = z.infer<typeof insertRoleSchema>;
 export type Role = typeof rolesTable.$inferSelect;

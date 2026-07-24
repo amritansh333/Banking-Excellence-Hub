@@ -9,8 +9,13 @@ import {
 } from "@workspace/db";
 import type { PermissionKey } from "./permissions";
 
-export async function getUserPermissions(user: AdminUser): Promise<Set<PermissionKey>> {
-  const [role] = await db.select().from(rolesTable).where(eq(rolesTable.id, user.roleId));
+export async function getUserPermissions(
+  user: AdminUser,
+): Promise<Set<PermissionKey>> {
+  const [role] = await db
+    .select()
+    .from(rolesTable)
+    .where(eq(rolesTable.id, user.roleId));
   if (!role) return new Set();
 
   if (role.isSuperAdmin === "true") {
@@ -21,15 +26,24 @@ export async function getUserPermissions(user: AdminUser): Promise<Set<Permissio
   const rolePerms = await db
     .select({ key: permissionsTable.key })
     .from(rolePermissionsTable)
-    .innerJoin(permissionsTable, eq(rolePermissionsTable.permissionId, permissionsTable.id))
+    .innerJoin(
+      permissionsTable,
+      eq(rolePermissionsTable.permissionId, permissionsTable.id),
+    )
     .where(eq(rolePermissionsTable.roleId, role.id));
 
   const permissionSet = new Set(rolePerms.map((p) => p.key as PermissionKey));
 
   const overrides = await db
-    .select({ key: permissionsTable.key, effect: userPermissionOverridesTable.effect })
+    .select({
+      key: permissionsTable.key,
+      effect: userPermissionOverridesTable.effect,
+    })
     .from(userPermissionOverridesTable)
-    .innerJoin(permissionsTable, eq(userPermissionOverridesTable.permissionId, permissionsTable.id))
+    .innerJoin(
+      permissionsTable,
+      eq(userPermissionOverridesTable.permissionId, permissionsTable.id),
+    )
     .where(eq(userPermissionOverridesTable.userId, user.id));
 
   for (const o of overrides) {
@@ -41,6 +55,9 @@ export async function getUserPermissions(user: AdminUser): Promise<Set<Permissio
 }
 
 export async function isSuperAdmin(user: AdminUser): Promise<boolean> {
-  const [role] = await db.select().from(rolesTable).where(eq(rolesTable.id, user.roleId));
+  const [role] = await db
+    .select()
+    .from(rolesTable)
+    .where(eq(rolesTable.id, user.roleId));
   return role?.isSuperAdmin === "true";
 }

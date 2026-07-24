@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Phone, Mail, Linkedin, Instagram, Facebook, Youtube } from "lucide-react";
+import {
+  Menu,
+  X,
+  Phone,
+  Mail,
+  Linkedin,
+  Instagram,
+  Facebook,
+  Youtube,
+} from "lucide-react";
 import logoPath from "@/attached_assets/logo.jpg";
 import { useSiteSettings, useNavigation } from "@/lib/useSiteSettings";
 
@@ -23,7 +32,8 @@ export function Navbar() {
     headerNav
       ?.filter((i) => i.menu === "header")
       .sort((a, b) => a.displayOrder - b.displayOrder)
-      .map((i) => ({ label: i.label, href: i.url ?? "/" })) ?? DEFAULT_NAV_LINKS;
+      .map((i) => ({ label: i.label, href: i.url ?? "/" })) ??
+    DEFAULT_NAV_LINKS;
 
   const phone = settings?.primaryPhone ?? "+91-6306286395";
   const email = settings?.primaryEmail ?? "admissions@thebankersacademy.org";
@@ -33,7 +43,8 @@ export function Navbar() {
     facebook: settings?.facebookUrl ?? "#",
     youtube: settings?.youtubeUrl ?? "#",
   };
-  const tagline = settings?.tagline ?? "Institute of Private Banking Excellence";
+  const tagline =
+    settings?.tagline ?? "Institute of Private Banking Excellence";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
@@ -41,21 +52,51 @@ export function Navbar() {
       <div className="bg-[#0B1F4D] text-white text-xs">
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between py-2">
           <div className="flex items-center gap-5">
-            <a href={`tel:${phone}`} className="flex items-center gap-1.5 hover:text-[#C89B3C] transition-colors">
+            <a
+              href={`tel:${phone}`}
+              className="flex items-center gap-1.5 hover:text-[#C89B3C] transition-colors"
+            >
               <Phone size={12} />
               <span>{phone}</span>
             </a>
             <span className="text-white/20 hidden sm:block">|</span>
-            <a href={`mailto:${email}`} className="hidden sm:flex items-center gap-1.5 hover:text-[#C89B3C] transition-colors">
+            <a
+              href={`mailto:${email}`}
+              className="hidden sm:flex items-center gap-1.5 hover:text-[#C89B3C] transition-colors"
+            >
               <Mail size={12} />
               <span>{email}</span>
             </a>
           </div>
           <div className="flex items-center gap-3">
-            <a href={socials.linkedin} aria-label="LinkedIn" className="hover:text-[#C89B3C] transition-colors"><Linkedin size={13} /></a>
-            <a href={socials.instagram} aria-label="Instagram" className="hover:text-[#C89B3C] transition-colors"><Instagram size={13} /></a>
-            <a href={socials.facebook} aria-label="Facebook" className="hover:text-[#C89B3C] transition-colors"><Facebook size={13} /></a>
-            <a href={socials.youtube} aria-label="YouTube" className="hover:text-[#C89B3C] transition-colors"><Youtube size={13} /></a>
+            <a
+              href={socials.linkedin}
+              aria-label="LinkedIn"
+              className="hover:text-[#C89B3C] transition-colors"
+            >
+              <Linkedin size={13} />
+            </a>
+            <a
+              href={socials.instagram}
+              aria-label="Instagram"
+              className="hover:text-[#C89B3C] transition-colors"
+            >
+              <Instagram size={13} />
+            </a>
+            <a
+              href={socials.facebook}
+              aria-label="Facebook"
+              className="hover:text-[#C89B3C] transition-colors"
+            >
+              <Facebook size={13} />
+            </a>
+            <a
+              href={socials.youtube}
+              aria-label="YouTube"
+              className="hover:text-[#C89B3C] transition-colors"
+            >
+              <Youtube size={13} />
+            </a>
           </div>
         </div>
       </div>
@@ -64,7 +105,6 @@ export function Navbar() {
       <nav className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between h-20">
-
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 shrink-0">
               <img
@@ -74,10 +114,16 @@ export function Navbar() {
                 style={{ maxWidth: "140px" }}
               />
               <div className="block leading-tight">
-                <div className="text-[#0B1F4D] font-bold text-base leading-tight" style={{ fontFamily: "'Raleway', sans-serif" }}>
+                <div
+                  className="text-[#0B1F4D] font-bold text-base leading-tight"
+                  style={{ fontFamily: "'Raleway', sans-serif" }}
+                >
                   The Bankers Academy
                 </div>
-                <div className="text-[#C89B3C] text-xs font-semibold tracking-wide" style={{ fontFamily: "'Open Sans', sans-serif" }}>
+                <div
+                  className="text-[#C89B3C] text-xs font-semibold tracking-wide"
+                  style={{ fontFamily: "'Open Sans', sans-serif" }}
+                >
                   {tagline}
                 </div>
               </div>

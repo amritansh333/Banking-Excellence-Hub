@@ -6,7 +6,9 @@ export const adminSessionsTable = pgTable("admin_sessions", {
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export type AdminSession = typeof adminSessionsTable.$inferSelect;
@@ -17,7 +19,9 @@ export const loginAttemptsTable = pgTable("login_attempts", {
   success: text("success").notNull(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export type LoginAttempt = typeof loginAttemptsTable.$inferSelect;

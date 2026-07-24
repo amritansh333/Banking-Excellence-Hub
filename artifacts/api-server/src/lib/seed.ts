@@ -8,27 +8,43 @@ import {
   globalSettingsTable,
   navigationItemsTable,
 } from "@workspace/db";
-import { PERMISSION_CATALOGUE, DEFAULT_PERSONAS, DEFAULT_ROLES } from "./permissions";
+import {
+  PERMISSION_CATALOGUE,
+  DEFAULT_PERSONAS,
+  DEFAULT_ROLES,
+} from "./permissions";
 import { logger } from "./logger";
 
 export async function seedRbacDefaults(): Promise<void> {
   for (const p of PERMISSION_CATALOGUE) {
-    const existing = await db.select().from(permissionsTable).where(eq(permissionsTable.key, p.key));
+    const existing = await db
+      .select()
+      .from(permissionsTable)
+      .where(eq(permissionsTable.key, p.key));
     if (existing.length === 0) {
-      await db.insert(permissionsTable).values({ key: p.key, category: p.category, label: p.label });
+      await db
+        .insert(permissionsTable)
+        .values({ key: p.key, category: p.category, label: p.label });
     }
   }
 
   const personaIdByKey = new Map<string, number>();
   for (const persona of DEFAULT_PERSONAS) {
-    const existing = await db.select().from(personasTable).where(eq(personasTable.key, persona.key));
+    const existing = await db
+      .select()
+      .from(personasTable)
+      .where(eq(personasTable.key, persona.key));
     if (existing.length > 0) {
       personaIdByKey.set(persona.key, existing[0].id);
       continue;
     }
     const [created] = await db
       .insert(personasTable)
-      .values({ key: persona.key, name: persona.name, description: persona.description })
+      .values({
+        key: persona.key,
+        name: persona.name,
+        description: persona.description,
+      })
       .returning();
     personaIdByKey.set(persona.key, created.id);
   }
@@ -37,7 +53,9 @@ export async function seedRbacDefaults(): Promise<void> {
   const permissionIdByKey = new Map(allPermissions.map((p) => [p.key, p.id]));
 
   for (const role of DEFAULT_ROLES) {
-    let roleRow = (await db.select().from(rolesTable).where(eq(rolesTable.key, role.key)))[0];
+    let roleRow = (
+      await db.select().from(rolesTable).where(eq(rolesTable.key, role.key))
+    )[0];
     if (!roleRow) {
       const [created] = await db
         .insert(rolesTable)
@@ -56,12 +74,16 @@ export async function seedRbacDefaults(): Promise<void> {
       .select()
       .from(rolePermissionsTable)
       .where(eq(rolePermissionsTable.roleId, roleRow.id));
-    const existingPermIds = new Set(existingRolePerms.map((rp) => rp.permissionId));
+    const existingPermIds = new Set(
+      existingRolePerms.map((rp) => rp.permissionId),
+    );
 
     for (const permKey of role.permissions) {
       const permId = permissionIdByKey.get(permKey);
       if (!permId || existingPermIds.has(permId)) continue;
-      await db.insert(rolePermissionsTable).values({ roleId: roleRow.id, permissionId: permId });
+      await db
+        .insert(rolePermissionsTable)
+        .values({ roleId: roleRow.id, permissionId: permId });
     }
   }
 
@@ -79,7 +101,8 @@ export async function seedSiteDefaults(): Promise<void> {
       primaryEmail: "admissions@thebankersacademy.org",
       admissionsEmail: "admissions@thebankersacademy.org",
       whatsappNumber: "+91-6306286395",
-      address: "First Floor Dev Residency, Plot No.803, P Block, Kakadeo, Kanpur",
+      address:
+        "First Floor Dev Residency, Plot No.803, P Block, Kakadeo, Kanpur",
       city: "Kanpur",
       state: "Uttar Pradesh",
       postalCode: "208025",
@@ -125,9 +148,21 @@ export async function seedSiteDefaults(): Promise<void> {
 
     const rows = [
       ...headerLinks.map((l, i) => ({ ...l, menu: "header", displayOrder: i })),
-      ...footerCol1.map((l, i) => ({ ...l, menu: "footer_col_1", displayOrder: i })),
-      ...footerCol2.map((l, i) => ({ ...l, menu: "footer_col_2", displayOrder: i })),
-      ...footerLegal.map((l, i) => ({ ...l, menu: "footer_legal", displayOrder: i })),
+      ...footerCol1.map((l, i) => ({
+        ...l,
+        menu: "footer_col_1",
+        displayOrder: i,
+      })),
+      ...footerCol2.map((l, i) => ({
+        ...l,
+        menu: "footer_col_2",
+        displayOrder: i,
+      })),
+      ...footerLegal.map((l, i) => ({
+        ...l,
+        menu: "footer_legal",
+        displayOrder: i,
+      })),
     ];
 
     for (const row of rows) {

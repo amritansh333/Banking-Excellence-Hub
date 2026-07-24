@@ -1,4 +1,11 @@
-import { pgTable, serial, text, integer, jsonb, timestamp } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  serial,
+  text,
+  integer,
+  jsonb,
+  timestamp,
+} from "drizzle-orm/pg-core";
 
 export const revisionsTable = pgTable("revisions", {
   id: serial("id").primaryKey(),
@@ -8,7 +15,9 @@ export const revisionsTable = pgTable("revisions", {
   changedBy: integer("changed_by"),
   previousData: jsonb("previous_data").$type<Record<string, unknown> | null>(),
   updatedData: jsonb("updated_data").$type<Record<string, unknown> | null>(),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export type Revision = typeof revisionsTable.$inferSelect;

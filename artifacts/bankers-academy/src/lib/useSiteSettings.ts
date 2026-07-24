@@ -26,8 +26,7 @@ export type NavItem = {
   isCta: string;
 };
 
-const API_BASE =
-  `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api`;
+const API_BASE = `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api`;
 
 export function useSiteSettings() {
   const [settings, setSettings] = useState<SiteSettings | null>(null);

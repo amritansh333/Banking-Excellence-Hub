@@ -3,7 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { adminApi, AdminApiError } from "../lib/adminApi";
 import { useAdminAuth } from "../lib/AdminAuthContext";
@@ -47,14 +53,20 @@ export default function Faqs() {
     setError(null);
     setSubmitting(true);
     try {
-      await adminApi.post("/admin/faqs", { question, answer, relatedPage: relatedPage || null });
+      await adminApi.post("/admin/faqs", {
+        question,
+        answer,
+        relatedPage: relatedPage || null,
+      });
       setOpen(false);
       setQuestion("");
       setAnswer("");
       setRelatedPage("");
       await load();
     } catch (err) {
-      setError(err instanceof AdminApiError ? err.message : "Failed to create FAQ.");
+      setError(
+        err instanceof AdminApiError ? err.message : "Failed to create FAQ.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -75,68 +87,127 @@ export default function Faqs() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-serif font-semibold text-[#0B1F4D]">FAQs</h1>
-          <p className="text-muted-foreground">Manage frequently asked questions shown across the site.</p>
+      {/* Hero Section */}
+      <div className="rounded-2xl border bg-gradient-to-r from-[#0B1F4D] via-[#15367E] to-[#2355C4] p-6 md:p-8 text-white shadow-lg">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-serif font-semibold">FAQs</h1>
+
+            <p className="mt-2 max-w-2xl text-sm text-blue-100 leading-relaxed">
+              Manage frequently asked questions displayed across the website to
+              help visitors quickly find answers about admissions, courses,
+              placements and other services.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-start md:items-end gap-4">
+            <div className="rounded-xl bg-white/10 px-5 py-4 backdrop-blur w-fit">
+              <p className="text-xs uppercase tracking-wider text-blue-100">
+                Knowledge Base
+              </p>
+
+              <p className="mt-1 text-lg font-semibold">FAQs Dashboard</p>
+            </div>
+
+            {canManage && (
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-[#C89B3C] text-[#0B1F4D] hover:bg-[#d4aa50] hover:text-[#0B1F4D] cursor-pointer">
+                    Add FAQ
+                  </Button>
+                </DialogTrigger>
+
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add FAQ</DialogTitle>
+                  </DialogHeader>
+
+                  <form onSubmit={handleCreate} className="space-y-4">
+                    <div className="space-y-1.5">
+                      <Label>Question</Label>
+                      <Input
+                        required
+                        value={question}
+                        onChange={(e) => setQuestion(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label>Answer</Label>
+
+                      <textarea
+                        required
+                        className="min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                        value={answer}
+                        onChange={(e) => setAnswer(e.target.value)}
+                      />
+                    </div>
+
+                    {error && (
+                      <p className="text-sm text-destructive">{error}</p>
+                    )}
+
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={submitting}
+                    >
+                      {submitting ? "Saving..." : "Add FAQ"}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
         </div>
-        {canManage && (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-[#C89B3C] text-[#0B1F4D] hover:bg-[#C89B3C]">Add FAQ</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add FAQ</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleCreate} className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label>Question</Label>
-                  <Input required value={question} onChange={(e) => setQuestion(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Answer</Label>
-                  <textarea
-                    required
-                    className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm min-h-24"
-                    value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
-                  />
-                </div>
-                
-                {error && <p className="text-sm text-destructive">{error}</p>}
-                <Button type="submit" className="w-full" disabled={submitting}>
-                  {submitting ? "Saving…" : "Add FAQ"}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        )}
       </div>
 
-      <Card>
-        <CardHeader>
+      <Card className="border shadow-md">
+        <CardHeader className="border-b">
           <CardTitle className="text-base">All FAQs</CardTitle>
         </CardHeader>
+
         <CardContent>
           {loading ? (
-            <p className="text-sm text-muted-foreground">Loading…</p>
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <div className="h-12 w-12 rounded-full border-4 border-[#0B1F4D] border-t-transparent animate-spin" />
+              <p className="text-sm text-muted-foreground">Loading FAQs...</p>
+            </div>
           ) : (
             <div className="divide-y">
               {items.map((f) => (
-                <div key={f.id} className="py-3 flex items-start justify-between gap-4">
+                <div
+                  key={f.id}
+                  className="py-3 flex items-start justify-between gap-4"
+                >
                   <div className="max-w-xl">
                     <p className="font-medium text-sm">{f.question}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{f.answer}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {f.answer}
+                    </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <Badge variant={f.status === "PUBLISHED" ? "default" : "secondary"}>{f.status}</Badge>
+                    <Badge
+                      variant={
+                        f.status === "PUBLISHED" ? "default" : "secondary"
+                      }
+                    >
+                      {f.status}
+                    </Badge>
                     {canManage && (
                       <>
-                        <Button size="sm" variant="outline" onClick={() => handleToggleStatus(f)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleToggleStatus(f)}
+                        >
                           {f.status === "PUBLISHED" ? "Unpublish" : "Publish"}
                         </Button>
-                        <Button size="sm" variant="destructive" onClick={() => handleDelete(f.id)}>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDelete(f.id)}
+                        >
                           Delete
                         </Button>
                       </>
@@ -144,7 +215,11 @@ export default function Faqs() {
                   </div>
                 </div>
               ))}
-              {items.length === 0 && <p className="text-sm text-muted-foreground py-4">No FAQs yet.</p>}
+              {items.length === 0 && (
+                <p className="text-sm text-muted-foreground py-4">
+                  No FAQs yet.
+                </p>
+              )}
             </div>
           )}
         </CardContent>

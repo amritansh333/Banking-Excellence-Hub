@@ -3,7 +3,13 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { adminApi, AdminApiError } from "../lib/adminApi";
 import { useAdminAuth } from "../lib/AdminAuthContext";
 
@@ -37,11 +43,20 @@ export default function Setup() {
     }
     setSubmitting(true);
     try {
-      await adminApi.post("/admin/bootstrap", { fullName, adminId, email, password });
+      await adminApi.post("/admin/bootstrap", {
+        fullName,
+        adminId,
+        email,
+        password,
+      });
       await refresh();
       navigate("/admin/dashboard", { replace: true });
     } catch (err) {
-      setError(err instanceof AdminApiError ? err.message : "Something went wrong. Please try again.");
+      setError(
+        err instanceof AdminApiError
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -53,30 +68,56 @@ export default function Setup() {
     <div className="min-h-screen flex items-center justify-center bg-[#0B1F4D] px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-[#0B1F4D]">Set up your Admin Panel</CardTitle>
+          <CardTitle className="text-[#0B1F4D]">
+            Set up your Admin Panel
+          </CardTitle>
           <CardDescription>
-            Create the first super admin account for The Bankers Academy admin panel. This can only be done once.
+            Create the first super admin account for The Bankers Academy admin
+            panel. This can only be done once.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="fullName">Full name</Label>
-              <Input id="fullName" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
+              <Input
+                id="fullName"
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="adminId">Admin ID</Label>
-              <Input id="adminId" required value={adminId} onChange={(e) => setAdminId(e.target.value)} />
+              <Input
+                id="adminId"
+                required
+                value={adminId}
+                onChange={(e) => setAdminId(e.target.value)}
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
               <p className="text-xs text-muted-foreground">
-                At least 10 characters, with uppercase, lowercase, a number and a symbol.
+                At least 10 characters, with uppercase, lowercase, a number and
+                a symbol.
               </p>
             </div>
             <div className="space-y-1.5">
@@ -90,7 +131,11 @@ export default function Setup() {
               />
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full bg-[#C89B3C] text-[#0B1F4D] hover:bg-[#C89B3C]" disabled={submitting}>
+            <Button
+              type="submit"
+              className="w-full bg-[#C89B3C] text-[#0B1F4D] hover:bg-[#C89B3C]"
+              disabled={submitting}
+            >
               {submitting ? "Creating account…" : "Create super admin account"}
             </Button>
           </form>

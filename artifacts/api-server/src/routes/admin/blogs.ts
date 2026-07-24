@@ -47,7 +47,11 @@ function toDate(value: unknown): Date | null | undefined {
 function toIdArray(value: unknown): number[] | undefined {
   if (value === undefined) return undefined;
   if (!Array.isArray(value)) return [];
-  return [...new Set(value.map(Number).filter((id) => Number.isInteger(id) && id > 0))];
+  return [
+    ...new Set(
+      value.map(Number).filter((id) => Number.isInteger(id) && id > 0),
+    ),
+  ];
 }
 
 function publicPost(post: BlogPost): boolean {
@@ -59,13 +63,25 @@ function readingTime(content: string): string {
   return `${Math.max(1, Math.ceil(words / 200))} min read`;
 }
 
-type CourseSummary = Pick<Course, "id" | "name" | "slug" | "shortDescription" | "thumbnailUrl" | "ctaLabel" | "ctaUrl">;
+type CourseSummary = Pick<
+  Course,
+  | "id"
+  | "name"
+  | "slug"
+  | "shortDescription"
+  | "thumbnailUrl"
+  | "ctaLabel"
+  | "ctaUrl"
+>;
 
 type HydratedBlog = BlogPost & {
   author: BlogAuthor | null;
   category: BlogCategory | null;
   tags: BlogTag[];
-  relatedPosts: Pick<BlogPost, "id" | "title" | "slug" | "excerpt" | "featuredImageUrl" | "publishedAt">[];
+  relatedPosts: Pick<
+    BlogPost,
+    "id" | "title" | "slug" | "excerpt" | "featuredImageUrl" | "publishedAt"
+  >[];
   relatedCourses: CourseSummary[];
   readingTime: string;
 };
@@ -74,35 +90,71 @@ type HydrateOptions = {
   publicOnly?: boolean;
 };
 
-async function hydratePosts(posts: BlogPost[], options: HydrateOptions = {}): Promise<HydratedBlog[]> {
+async function hydratePosts(
+  posts: BlogPost[],
+  options: HydrateOptions = {},
+): Promise<HydratedBlog[]> {
   if (posts.length === 0) return [];
 
   const postIds = posts.map((post) => post.id);
 
-  const [authors, categories, tags, tagLinks, relatedPostLinks, relatedCourseLinks, courses] = await Promise.all([
+  const [
+    authors,
+    categories,
+    tags,
+    tagLinks,
+    relatedPostLinks,
+    relatedCourseLinks,
+    courses,
+  ] = await Promise.all([
     db.select().from(blogAuthorsTable),
     db.select().from(blogCategoriesTable),
     db.select().from(blogTagsTable),
-    db.select().from(blogPostTagsTable).where(inArray(blogPostTagsTable.postId, postIds)),
-    db.select().from(blogRelatedPostsTable).where(inArray(blogRelatedPostsTable.postId, postIds)),
-    db.select().from(blogRelatedCoursesTable).where(inArray(blogRelatedCoursesTable.postId, postIds)),
-    db.select().from(coursesTable).orderBy(asc(coursesTable.displayOrder), asc(coursesTable.name)),
+    db
+      .select()
+      .from(blogPostTagsTable)
+      .where(inArray(blogPostTagsTable.postId, postIds)),
+    db
+      .select()
+      .from(blogRelatedPostsTable)
+      .where(inArray(blogRelatedPostsTable.postId, postIds)),
+    db
+      .select()
+      .from(blogRelatedCoursesTable)
+      .where(inArray(blogRelatedCoursesTable.postId, postIds)),
+    db
+      .select()
+      .from(coursesTable)
+      .orderBy(asc(coursesTable.displayOrder), asc(coursesTable.name)),
   ]);
 
   const authorMap = new Map(authors.map((author) => [author.id, author]));
-  const categoryMap = new Map(categories.map((category) => [category.id, category]));
+  const categoryMap = new Map(
+    categories.map((category) => [category.id, category]),
+  );
   const tagMap = new Map(tags.map((tag) => [tag.id, tag]));
-  const relatedPostIds = [...new Set(relatedPostLinks.map((link) => link.relatedPostId))];
+  const relatedPostIds = [
+    ...new Set(relatedPostLinks.map((link) => link.relatedPostId)),
+  ];
   const relatedPostRows =
     relatedPostIds.length > 0
-      ? await db.select().from(blogPostsTable).where(inArray(blogPostsTable.id, relatedPostIds))
+      ? await db
+          .select()
+          .from(blogPostsTable)
+          .where(inArray(blogPostsTable.id, relatedPostIds))
       : [];
-  const availableRelatedPosts = options.publicOnly ? relatedPostRows.filter(publicPost) : relatedPostRows;
-  const postMap = new Map([...posts, ...availableRelatedPosts].map((post) => [post.id, post]));
+  const availableRelatedPosts = options.publicOnly
+    ? relatedPostRows.filter(publicPost)
+    : relatedPostRows;
+  const postMap = new Map(
+    [...posts, ...availableRelatedPosts].map((post) => [post.id, post]),
+  );
   const availableCourses = options.publicOnly
     ? courses.filter((course) => course.active && course.status === "PUBLISHED")
     : courses;
-  const courseMap = new Map(availableCourses.map((course) => [course.id, course]));
+  const courseMap = new Map(
+    availableCourses.map((course) => [course.id, course]),
+  );
 
   return posts.map((post) => {
     const postTags = tagLinks
@@ -139,8 +191,10 @@ async function hydratePosts(posts: BlogPost[], options: HydrateOptions = {}): Pr
 
     return {
       ...post,
-      author: post.authorId ? authorMap.get(post.authorId) ?? null : null,
-      category: post.categoryId ? categoryMap.get(post.categoryId) ?? null : null,
+      author: post.authorId ? (authorMap.get(post.authorId) ?? null) : null,
+      category: post.categoryId
+        ? (categoryMap.get(post.categoryId) ?? null)
+        : null,
       tags: postTags,
       relatedPosts,
       relatedCourses,
@@ -165,20 +219,34 @@ function buildPostPayload(body: Record<string, unknown>, isUpdate: boolean) {
 
   if (typeof body.title === "string") data.title = body.title.trim();
   if (typeof body.slug === "string") data.slug = slugify(body.slug);
-  if (body.excerpt !== undefined) data.excerpt = body.excerpt ? String(body.excerpt) : null;
-  if (body.featuredImageUrl !== undefined) data.featuredImageUrl = body.featuredImageUrl ? String(body.featuredImageUrl) : null;
-  if (body.authorId !== undefined) data.authorId = body.authorId ? Number(body.authorId) : null;
-  if (body.categoryId !== undefined) data.categoryId = body.categoryId ? Number(body.categoryId) : null;
+  if (body.excerpt !== undefined)
+    data.excerpt = body.excerpt ? String(body.excerpt) : null;
+  if (body.featuredImageUrl !== undefined)
+    data.featuredImageUrl = body.featuredImageUrl
+      ? String(body.featuredImageUrl)
+      : null;
+  if (body.authorId !== undefined)
+    data.authorId = body.authorId ? Number(body.authorId) : null;
+  if (body.categoryId !== undefined)
+    data.categoryId = body.categoryId ? Number(body.categoryId) : null;
   if (typeof body.content === "string") data.content = body.content;
   if (status) data.status = status;
   if (publishedAt !== undefined) data.publishedAt = publishedAt;
   if (scheduledAt !== undefined) data.scheduledAt = scheduledAt;
-  if (body.seoTitle !== undefined) data.seoTitle = body.seoTitle ? String(body.seoTitle) : null;
-  if (body.metaDescription !== undefined) data.metaDescription = body.metaDescription ? String(body.metaDescription) : null;
-  if (body.canonicalUrl !== undefined) data.canonicalUrl = body.canonicalUrl ? String(body.canonicalUrl) : null;
-  if (body.ogTitle !== undefined) data.ogTitle = body.ogTitle ? String(body.ogTitle) : null;
-  if (body.ogDescription !== undefined) data.ogDescription = body.ogDescription ? String(body.ogDescription) : null;
-  if (body.ogImage !== undefined) data.ogImage = body.ogImage ? String(body.ogImage) : null;
+  if (body.seoTitle !== undefined)
+    data.seoTitle = body.seoTitle ? String(body.seoTitle) : null;
+  if (body.metaDescription !== undefined)
+    data.metaDescription = body.metaDescription
+      ? String(body.metaDescription)
+      : null;
+  if (body.canonicalUrl !== undefined)
+    data.canonicalUrl = body.canonicalUrl ? String(body.canonicalUrl) : null;
+  if (body.ogTitle !== undefined)
+    data.ogTitle = body.ogTitle ? String(body.ogTitle) : null;
+  if (body.ogDescription !== undefined)
+    data.ogDescription = body.ogDescription ? String(body.ogDescription) : null;
+  if (body.ogImage !== undefined)
+    data.ogImage = body.ogImage ? String(body.ogImage) : null;
 
   if (data.status === "PUBLISHED" && data.publishedAt === undefined) {
     data.publishedAt = new Date();
@@ -192,7 +260,11 @@ function buildPostPayload(body: Record<string, unknown>, isUpdate: boolean) {
   };
 }
 
-function parsePositiveInt(value: unknown, fallback: number, max: number): number {
+function parsePositiveInt(
+  value: unknown,
+  fallback: number,
+  max: number,
+): number {
   const parsed = Number(value);
   if (!Number.isInteger(parsed) || parsed <= 0) return fallback;
   return Math.min(parsed, max);
@@ -211,55 +283,88 @@ async function replaceRelations(
   },
 ): Promise<void> {
   if (relations.tagIds) {
-    await db.delete(blogPostTagsTable).where(eq(blogPostTagsTable.postId, postId));
+    await db
+      .delete(blogPostTagsTable)
+      .where(eq(blogPostTagsTable.postId, postId));
     if (relations.tagIds.length > 0) {
-      await db.insert(blogPostTagsTable).values(relations.tagIds.map((tagId) => ({ postId, tagId })));
+      await db
+        .insert(blogPostTagsTable)
+        .values(relations.tagIds.map((tagId) => ({ postId, tagId })));
     }
   }
 
   if (relations.relatedPostIds) {
-    await db.delete(blogRelatedPostsTable).where(eq(blogRelatedPostsTable.postId, postId));
-    const relatedPostIds = relations.relatedPostIds.filter((relatedPostId) => relatedPostId !== postId);
+    await db
+      .delete(blogRelatedPostsTable)
+      .where(eq(blogRelatedPostsTable.postId, postId));
+    const relatedPostIds = relations.relatedPostIds.filter(
+      (relatedPostId) => relatedPostId !== postId,
+    );
     if (relatedPostIds.length > 0) {
       await db
         .insert(blogRelatedPostsTable)
-        .values(relatedPostIds.map((relatedPostId) => ({ postId, relatedPostId })));
+        .values(
+          relatedPostIds.map((relatedPostId) => ({ postId, relatedPostId })),
+        );
     }
   }
 
   if (relations.relatedCourseIds) {
-    await db.delete(blogRelatedCoursesTable).where(eq(blogRelatedCoursesTable.postId, postId));
+    await db
+      .delete(blogRelatedCoursesTable)
+      .where(eq(blogRelatedCoursesTable.postId, postId));
     if (relations.relatedCourseIds.length > 0) {
       await db
         .insert(blogRelatedCoursesTable)
-        .values(relations.relatedCourseIds.map((courseId) => ({ postId, courseId })));
+        .values(
+          relations.relatedCourseIds.map((courseId) => ({ postId, courseId })),
+        );
     }
   }
 }
 
 async function getAllPosts(): Promise<BlogPost[]> {
-  return db.select().from(blogPostsTable).orderBy(desc(blogPostsTable.publishedAt), desc(blogPostsTable.updatedAt));
+  return db
+    .select()
+    .from(blogPostsTable)
+    .orderBy(desc(blogPostsTable.publishedAt), desc(blogPostsTable.updatedAt));
 }
 
 // ---------- Public ----------
 
 router.get("/blogs/categories", async (_req, res): Promise<void> => {
-  const posts = (await hydratePosts((await getAllPosts()).filter(publicPost), { publicOnly: true }));
+  const posts = await hydratePosts((await getAllPosts()).filter(publicPost), {
+    publicOnly: true,
+  });
   const counts = new Map<number, number>();
   posts.forEach((post) => {
-    if (post.category) counts.set(post.category.id, (counts.get(post.category.id) ?? 0) + 1);
+    if (post.category)
+      counts.set(post.category.id, (counts.get(post.category.id) ?? 0) + 1);
   });
-  const categories = (await db.select().from(blogCategoriesTable).orderBy(asc(blogCategoriesTable.name)))
+  const categories = (
+    await db
+      .select()
+      .from(blogCategoriesTable)
+      .orderBy(asc(blogCategoriesTable.name))
+  )
     .map((category) => ({ ...category, count: counts.get(category.id) ?? 0 }))
     .filter((category) => category.count > 0);
   res.json(categories);
 });
 
 router.get("/blogs/tags", async (_req, res): Promise<void> => {
-  const posts = await hydratePosts((await getAllPosts()).filter(publicPost), { publicOnly: true });
+  const posts = await hydratePosts((await getAllPosts()).filter(publicPost), {
+    publicOnly: true,
+  });
   const counts = new Map<number, number>();
-  posts.forEach((post) => post.tags.forEach((tag) => counts.set(tag.id, (counts.get(tag.id) ?? 0) + 1)));
-  const tags = (await db.select().from(blogTagsTable).orderBy(asc(blogTagsTable.name)))
+  posts.forEach((post) =>
+    post.tags.forEach((tag) =>
+      counts.set(tag.id, (counts.get(tag.id) ?? 0) + 1),
+    ),
+  );
+  const tags = (
+    await db.select().from(blogTagsTable).orderBy(asc(blogTagsTable.name))
+  )
     .map((tag) => ({ ...tag, count: counts.get(tag.id) ?? 0 }))
     .filter((tag) => tag.count > 0);
   res.json(tags);
@@ -290,7 +395,12 @@ router.get("/blogs/:slug/related", async (req, res): Promise<void> => {
   const explicit = post.relatedPosts.filter((item) => item.id !== post.id);
   const explicitIds = new Set(explicit.map((item) => item.id));
   const sameCategory = hydrated
-    .filter((item) => item.id !== post.id && item.category?.id === post.category?.id && !explicitIds.has(item.id))
+    .filter(
+      (item) =>
+        item.id !== post.id &&
+        item.category?.id === post.category?.id &&
+        !explicitIds.has(item.id),
+    )
     .map((item) => ({
       id: item.id,
       title: item.title,
@@ -299,7 +409,9 @@ router.get("/blogs/:slug/related", async (req, res): Promise<void> => {
       featuredImageUrl: item.featuredImageUrl,
       publishedAt: item.publishedAt,
     }));
-  const relatedIds = new Set([...explicit, ...sameCategory].map((item) => item.id));
+  const relatedIds = new Set(
+    [...explicit, ...sameCategory].map((item) => item.id),
+  );
   const latest = hydrated
     .filter((item) => item.id !== post.id && !relatedIds.has(item.id))
     .map((item) => ({
@@ -317,14 +429,31 @@ router.get("/blogs/:slug/related", async (req, res): Promise<void> => {
 router.get("/blogs", async (req, res): Promise<void> => {
   const page = parsePositiveInt(req.query.page, 1, 1000);
   const pageSize = parsePositiveInt(req.query.pageSize, 9, 24);
-  const query = typeof req.query.search === "string" ? req.query.search.trim().toLowerCase() : "";
-  const category = typeof req.query.category === "string" ? req.query.category.trim().toLowerCase() : "";
-  const tag = typeof req.query.tag === "string" ? req.query.tag.trim().toLowerCase() : "";
-  const hydrated = await hydratePosts((await getAllPosts()).filter(publicPost), { publicOnly: true });
+  const query =
+    typeof req.query.search === "string"
+      ? req.query.search.trim().toLowerCase()
+      : "";
+  const category =
+    typeof req.query.category === "string"
+      ? req.query.category.trim().toLowerCase()
+      : "";
+  const tag =
+    typeof req.query.tag === "string" ? req.query.tag.trim().toLowerCase() : "";
+  const hydrated = await hydratePosts(
+    (await getAllPosts()).filter(publicPost),
+    { publicOnly: true },
+  );
   const filtered = hydrated.filter((post) => {
     const categoryMatches =
-      !category || post.category?.slug.toLowerCase() === category || post.category?.name.toLowerCase() === category;
-    const tagMatches = !tag || post.tags.some((item) => item.slug.toLowerCase() === tag || item.name.toLowerCase() === tag);
+      !category ||
+      post.category?.slug.toLowerCase() === category ||
+      post.category?.name.toLowerCase() === category;
+    const tagMatches =
+      !tag ||
+      post.tags.some(
+        (item) =>
+          item.slug.toLowerCase() === tag || item.name.toLowerCase() === tag,
+      );
     const searchMatches =
       !query ||
       matchesText(post.title, query) ||
@@ -358,38 +487,50 @@ router.get("/blogs/:slug", async (req, res): Promise<void> => {
 
   const hydrated = await hydratePosts(posts, { publicOnly: true });
   const currentIndex = hydrated.findIndex((item) => item.id === post.id);
-  const relatedResponse = await new Promise<HydratedBlog["relatedPosts"]>((resolve) => {
-    const current = hydrated[currentIndex];
-    const explicit = current.relatedPosts.filter((item) => item.id !== current.id);
-    const explicitIds = new Set(explicit.map((item) => item.id));
-    const sameCategory = hydrated
-      .filter((item) => item.id !== current.id && item.category?.id === current.category?.id && !explicitIds.has(item.id))
-      .map((item) => ({
-        id: item.id,
-        title: item.title,
-        slug: item.slug,
-        excerpt: item.excerpt,
-        featuredImageUrl: item.featuredImageUrl,
-        publishedAt: item.publishedAt,
-      }));
-    const relatedIds = new Set([...explicit, ...sameCategory].map((item) => item.id));
-    const latest = hydrated
-      .filter((item) => item.id !== current.id && !relatedIds.has(item.id))
-      .map((item) => ({
-        id: item.id,
-        title: item.title,
-        slug: item.slug,
-        excerpt: item.excerpt,
-        featuredImageUrl: item.featuredImageUrl,
-        publishedAt: item.publishedAt,
-      }));
-    resolve([...explicit, ...sameCategory, ...latest].slice(0, 3));
-  });
+  const relatedResponse = await new Promise<HydratedBlog["relatedPosts"]>(
+    (resolve) => {
+      const current = hydrated[currentIndex];
+      const explicit = current.relatedPosts.filter(
+        (item) => item.id !== current.id,
+      );
+      const explicitIds = new Set(explicit.map((item) => item.id));
+      const sameCategory = hydrated
+        .filter(
+          (item) =>
+            item.id !== current.id &&
+            item.category?.id === current.category?.id &&
+            !explicitIds.has(item.id),
+        )
+        .map((item) => ({
+          id: item.id,
+          title: item.title,
+          slug: item.slug,
+          excerpt: item.excerpt,
+          featuredImageUrl: item.featuredImageUrl,
+          publishedAt: item.publishedAt,
+        }));
+      const relatedIds = new Set(
+        [...explicit, ...sameCategory].map((item) => item.id),
+      );
+      const latest = hydrated
+        .filter((item) => item.id !== current.id && !relatedIds.has(item.id))
+        .map((item) => ({
+          id: item.id,
+          title: item.title,
+          slug: item.slug,
+          excerpt: item.excerpt,
+          featuredImageUrl: item.featuredImageUrl,
+          publishedAt: item.publishedAt,
+        }));
+      resolve([...explicit, ...sameCategory, ...latest].slice(0, 3));
+    },
+  );
 
   res.json({
     blog: hydrated[currentIndex],
     previousBlog: currentIndex > 0 ? hydrated[currentIndex - 1] : null,
-    nextBlog: currentIndex < hydrated.length - 1 ? hydrated[currentIndex + 1] : null,
+    nextBlog:
+      currentIndex < hydrated.length - 1 ? hydrated[currentIndex + 1] : null,
     relatedBlogs: relatedResponse,
   });
 });
@@ -401,7 +542,12 @@ router.get(
   requireAdminAuth,
   requirePermission(PERMISSIONS.BLOG_VIEW),
   async (_req, res): Promise<void> => {
-    res.json(await db.select().from(blogAuthorsTable).orderBy(asc(blogAuthorsTable.name)));
+    res.json(
+      await db
+        .select()
+        .from(blogAuthorsTable)
+        .orderBy(asc(blogAuthorsTable.name)),
+    );
   },
 );
 
@@ -447,9 +593,17 @@ router.patch(
     const [row] = await db
       .update(blogAuthorsTable)
       .set({
-        ...(typeof req.body.name === "string" ? { name: req.body.name.trim() } : {}),
-        ...(req.body.bio !== undefined ? { bio: req.body.bio ? String(req.body.bio) : null } : {}),
-        ...(req.body.avatarUrl !== undefined ? { avatarUrl: req.body.avatarUrl ? String(req.body.avatarUrl) : null } : {}),
+        ...(typeof req.body.name === "string"
+          ? { name: req.body.name.trim() }
+          : {}),
+        ...(req.body.bio !== undefined
+          ? { bio: req.body.bio ? String(req.body.bio) : null }
+          : {}),
+        ...(req.body.avatarUrl !== undefined
+          ? {
+              avatarUrl: req.body.avatarUrl ? String(req.body.avatarUrl) : null,
+            }
+          : {}),
       })
       .where(eq(blogAuthorsTable.id, id))
       .returning();
@@ -478,7 +632,10 @@ router.delete(
   requirePermission(PERMISSIONS.BLOG_MANAGE),
   async (req, res): Promise<void> => {
     const id = parseId(req.params.id);
-    const [row] = await db.delete(blogAuthorsTable).where(eq(blogAuthorsTable.id, id)).returning();
+    const [row] = await db
+      .delete(blogAuthorsTable)
+      .where(eq(blogAuthorsTable.id, id))
+      .returning();
 
     if (!row) {
       res.status(404).json({ error: "Author not found" });
@@ -503,7 +660,12 @@ router.get(
   requireAdminAuth,
   requirePermission(PERMISSIONS.BLOG_VIEW),
   async (_req, res): Promise<void> => {
-    res.json(await db.select().from(blogCategoriesTable).orderBy(asc(blogCategoriesTable.name)));
+    res.json(
+      await db
+        .select()
+        .from(blogCategoriesTable)
+        .orderBy(asc(blogCategoriesTable.name)),
+    );
   },
 );
 
@@ -513,13 +675,19 @@ router.post(
   requirePermission(PERMISSIONS.BLOG_MANAGE),
   async (req, res): Promise<void> => {
     const name = typeof req.body.name === "string" ? req.body.name.trim() : "";
-    const slug = typeof req.body.slug === "string" && req.body.slug ? slugify(req.body.slug) : slugify(name);
+    const slug =
+      typeof req.body.slug === "string" && req.body.slug
+        ? slugify(req.body.slug)
+        : slugify(name);
     if (!name || !slug) {
       res.status(400).json({ error: "Category name is required." });
       return;
     }
 
-    const [row] = await db.insert(blogCategoriesTable).values({ name, slug }).returning();
+    const [row] = await db
+      .insert(blogCategoriesTable)
+      .values({ name, slug })
+      .returning();
     await writeAuditLog(req, {
       actorId: req.adminUser!.id,
       actorLabel: req.adminUser!.fullName,
@@ -541,8 +709,12 @@ router.patch(
     const [row] = await db
       .update(blogCategoriesTable)
       .set({
-        ...(typeof req.body.name === "string" ? { name: req.body.name.trim() } : {}),
-        ...(typeof req.body.slug === "string" ? { slug: slugify(req.body.slug) } : {}),
+        ...(typeof req.body.name === "string"
+          ? { name: req.body.name.trim() }
+          : {}),
+        ...(typeof req.body.slug === "string"
+          ? { slug: slugify(req.body.slug) }
+          : {}),
       })
       .where(eq(blogCategoriesTable.id, id))
       .returning();
@@ -570,7 +742,10 @@ router.delete(
   requirePermission(PERMISSIONS.BLOG_MANAGE),
   async (req, res): Promise<void> => {
     const id = parseId(req.params.id);
-    const [row] = await db.delete(blogCategoriesTable).where(eq(blogCategoriesTable.id, id)).returning();
+    const [row] = await db
+      .delete(blogCategoriesTable)
+      .where(eq(blogCategoriesTable.id, id))
+      .returning();
     if (!row) {
       res.status(404).json({ error: "Category not found" });
       return;
@@ -593,7 +768,9 @@ router.get(
   requireAdminAuth,
   requirePermission(PERMISSIONS.BLOG_VIEW),
   async (_req, res): Promise<void> => {
-    res.json(await db.select().from(blogTagsTable).orderBy(asc(blogTagsTable.name)));
+    res.json(
+      await db.select().from(blogTagsTable).orderBy(asc(blogTagsTable.name)),
+    );
   },
 );
 
@@ -603,13 +780,19 @@ router.post(
   requirePermission(PERMISSIONS.BLOG_MANAGE),
   async (req, res): Promise<void> => {
     const name = typeof req.body.name === "string" ? req.body.name.trim() : "";
-    const slug = typeof req.body.slug === "string" && req.body.slug ? slugify(req.body.slug) : slugify(name);
+    const slug =
+      typeof req.body.slug === "string" && req.body.slug
+        ? slugify(req.body.slug)
+        : slugify(name);
     if (!name || !slug) {
       res.status(400).json({ error: "Tag name is required." });
       return;
     }
 
-    const [row] = await db.insert(blogTagsTable).values({ name, slug }).returning();
+    const [row] = await db
+      .insert(blogTagsTable)
+      .values({ name, slug })
+      .returning();
     await writeAuditLog(req, {
       actorId: req.adminUser!.id,
       actorLabel: req.adminUser!.fullName,
@@ -631,8 +814,12 @@ router.patch(
     const [row] = await db
       .update(blogTagsTable)
       .set({
-        ...(typeof req.body.name === "string" ? { name: req.body.name.trim() } : {}),
-        ...(typeof req.body.slug === "string" ? { slug: slugify(req.body.slug) } : {}),
+        ...(typeof req.body.name === "string"
+          ? { name: req.body.name.trim() }
+          : {}),
+        ...(typeof req.body.slug === "string"
+          ? { slug: slugify(req.body.slug) }
+          : {}),
       })
       .where(eq(blogTagsTable.id, id))
       .returning();
@@ -660,7 +847,10 @@ router.delete(
   requirePermission(PERMISSIONS.BLOG_MANAGE),
   async (req, res): Promise<void> => {
     const id = parseId(req.params.id);
-    const [row] = await db.delete(blogTagsTable).where(eq(blogTagsTable.id, id)).returning();
+    const [row] = await db
+      .delete(blogTagsTable)
+      .where(eq(blogTagsTable.id, id))
+      .returning();
     if (!row) {
       res.status(404).json({ error: "Tag not found" });
       return;
@@ -683,7 +873,12 @@ router.get(
   requireAdminAuth,
   requirePermission(PERMISSIONS.BLOG_VIEW),
   async (_req, res): Promise<void> => {
-    res.json(await db.select().from(coursesTable).orderBy(asc(coursesTable.displayOrder), asc(coursesTable.name)));
+    res.json(
+      await db
+        .select()
+        .from(coursesTable)
+        .orderBy(asc(coursesTable.displayOrder), asc(coursesTable.name)),
+    );
   },
 );
 
@@ -731,7 +926,12 @@ router.post(
     try {
       payload = buildPostPayload(req.body, false);
     } catch (error) {
-      res.status(400).json({ error: error instanceof Error ? error.message : "Invalid blog payload." });
+      res
+        .status(400)
+        .json({
+          error:
+            error instanceof Error ? error.message : "Invalid blog payload.",
+        });
       return;
     }
 
@@ -774,7 +974,12 @@ router.patch(
     try {
       payload = buildPostPayload(req.body, true);
     } catch (error) {
-      res.status(400).json({ error: error instanceof Error ? error.message : "Invalid blog payload." });
+      res
+        .status(400)
+        .json({
+          error:
+            error instanceof Error ? error.message : "Invalid blog payload.",
+        });
       return;
     }
 

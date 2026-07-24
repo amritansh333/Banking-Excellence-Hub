@@ -4,6 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
 
 import { AdminAuthProvider } from "@/admin/lib/AdminAuthContext";
 import { RequireAdmin } from "@/admin/components/RequireAdmin";
@@ -71,14 +73,12 @@ function PublicRouter() {
   );
 }
 
-
-
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <ScrollToTop />
           <AdminAuthProvider>
             <Switch>
               {/* ---------- Admin ---------- */}
@@ -160,6 +160,8 @@ function App() {
               </Route>
             </Switch>
           </AdminAuthProvider>
+
+          <ScrollToTopButton />
 
           <Toaster />
         </WouterRouter>

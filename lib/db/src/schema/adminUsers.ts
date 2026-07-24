@@ -10,8 +10,12 @@ export const adminUsersTable = pgTable("admin_users", {
   adminId: text("admin_id").notNull().unique(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  roleId: integer("role_id").notNull().references(() => rolesTable.id, { onDelete: "restrict" }),
-  personaId: integer("persona_id").references(() => personasTable.id, { onDelete: "set null" }),
+  roleId: integer("role_id")
+    .notNull()
+    .references(() => rolesTable.id, { onDelete: "restrict" }),
+  personaId: integer("persona_id").references(() => personasTable.id, {
+    onDelete: "set null",
+  }),
   status: text("status").notNull().default("PENDING"), // PENDING, ACTIVE, INACTIVE, SUSPENDED, LOCKED, REMOVED
   failedLoginCount: integer("failed_login_count").notNull().default(0),
   lockedUntil: timestamp("locked_until", { withTimezone: true }),
@@ -20,10 +24,19 @@ export const adminUsersTable = pgTable("admin_users", {
   updatedBy: integer("updated_by"),
   removedAt: timestamp("removed_at", { withTimezone: true }),
   removedBy: integer("removed_by"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
-export const insertAdminUserSchema = createInsertSchema(adminUsersTable).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertAdminUserSchema = createInsertSchema(adminUsersTable).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
 export type AdminUser = typeof adminUsersTable.$inferSelect;

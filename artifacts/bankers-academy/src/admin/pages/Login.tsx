@@ -36,7 +36,7 @@ export default function Login() {
     (async () => {
       try {
         const res = await adminApi.get<{ bootstrapCompleted: boolean }>(
-          "/admin/bootstrap-status"
+          "/admin/bootstrap-status",
         );
 
         if (mounted && !res.bootstrapCompleted) {
@@ -82,9 +82,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-[#0B1F4D] px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-[#0B1F4D]">
-            Admin Panel Login
-          </CardTitle>
+          <CardTitle className="text-[#0B1F4D]">Admin Panel Login</CardTitle>
 
           <CardDescription>
             The Bankers Academy LLP — restricted access
@@ -94,9 +92,7 @@ export default function Login() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="identifier">
-                Admin ID or email
-              </Label>
+              <Label htmlFor="identifier">Admin ID or email</Label>
 
               <Input
                 id="identifier"
@@ -107,9 +103,7 @@ export default function Login() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password">
-                Password
-              </Label>
+              <Label htmlFor="password">Password</Label>
 
               <Input
                 id="password"
@@ -120,11 +114,7 @@ export default function Login() {
               />
             </div>
 
-            {error && (
-              <p className="text-sm text-destructive">
-                {error}
-              </p>
-            )}
+            {error && <p className="text-sm text-destructive">{error}</p>}
 
             <Button
               type="submit"

@@ -1,5 +1,4 @@
-const API_BASE =
-  import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const BASE = `${API_BASE}/api`;
 
@@ -36,10 +35,15 @@ export type BlogPost = {
   ogTitle: string | null;
   ogDescription: string | null;
   ogImage: string | null;
-  author: (BlogLookup & { bio: string | null; avatarUrl: string | null }) | null;
+  author:
+    | (BlogLookup & { bio: string | null; avatarUrl: string | null })
+    | null;
   category: BlogLookup | null;
   tags: BlogLookup[];
-  relatedPosts: Pick<BlogPost, "id" | "title" | "slug" | "excerpt" | "featuredImageUrl" | "publishedAt">[];
+  relatedPosts: Pick<
+    BlogPost,
+    "id" | "title" | "slug" | "excerpt" | "featuredImageUrl" | "publishedAt"
+  >[];
   relatedCourses: BlogCourse[];
   readingTime: string;
 };
@@ -76,23 +80,31 @@ function toQuery(params: BlogListParams = {}): string {
   return query ? `?${query}` : "";
 }
 
-export async function fetchPublicBlogs(params: BlogListParams = {}): Promise<BlogListResponse> {
+export async function fetchPublicBlogs(
+  params: BlogListParams = {},
+): Promise<BlogListResponse> {
   const response = await fetch(`${BASE}/blogs${toQuery(params)}`);
   if (!response.ok) throw new Error("Unable to load blogs.");
   return response.json();
 }
 
-export async function fetchPublicBlog(slug: string): Promise<BlogDetailResponse> {
+export async function fetchPublicBlog(
+  slug: string,
+): Promise<BlogDetailResponse> {
   const response = await fetch(`${BASE}/blogs/${slug}`);
   if (!response.ok) {
-    const error = new Error(response.status === 404 ? "Blog not found." : "Unable to load blog.");
+    const error = new Error(
+      response.status === 404 ? "Blog not found." : "Unable to load blog.",
+    );
     error.name = String(response.status);
     throw error;
   }
   return response.json();
 }
 
-export async function fetchPublicBlogCategories(): Promise<BlogLookupWithCount[]> {
+export async function fetchPublicBlogCategories(): Promise<
+  BlogLookupWithCount[]
+> {
   const response = await fetch(`${BASE}/blogs/categories`);
   if (!response.ok) throw new Error("Unable to load blog categories.");
   return response.json();
@@ -118,5 +130,7 @@ export async function fetchLatestBlogs(limit = 4): Promise<BlogPost[]> {
 
 export function formatBlogDate(value: string | null): string {
   if (!value) return "Not published";
-  return new Intl.DateTimeFormat("en-IN", { dateStyle: "medium" }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-IN", { dateStyle: "medium" }).format(
+    new Date(value),
+  );
 }
